@@ -1,28 +1,38 @@
 import { ethers } from 'hardhat';
 
 const main = async () => {
-  const gameContractFactory = await ethers.getContractFactory("EpicGame");
+  const gameContractFactory = await ethers.getContractFactory('EpicGame');
   const gameContract = await gameContractFactory.deploy(
-    ["Aoife Bray", "Eva Lara", "Eleanor Blevins"],
-		[
-			"https://i.imgur.com/0cqZrkN.png",
-			"https://i.imgur.com/Txq4CJJ.png",
-			"https://i.imgur.com/1osfEhf.png",
-		],
+    ['Aoife Bray', 'Eva Lara', 'Eleanor Blevins'],
+    [
+      'https://i.imgur.com/pbvx2J1.png',
+      'https://i.imgur.com/OhuPEMy.png',
+      'https://i.imgur.com/OyETLNw.png',
+    ],
     [150, 100, 50],
-    [50, 100, 150]
+    [50, 100, 150],
+    'Aysha Mathis',
+    'https://i.imgur.com/fwCegM5.png',
+    10000,
+    50
   );
 
   await gameContract.deployed();
+  console.log('Contract address: ', gameContract.address);
 
-  console.log("Contrato implantado no endereço:", gameContract.address);
+  let txn;
 
-  const txn = await gameContract.mintCharacter(2);
+  txn = await gameContract.mintCharacter(2);
+  await txn.wait();
+
+  txn = await gameContract.attackBoss();
+  await txn.wait();
+
+  txn = await gameContract.attackBoss();
   await txn.wait();
 
   const returnedTokenUri = await gameContract.tokenURI(1);
-  console.log("Token URI:", returnedTokenUri);
-  
+  console.log('Token URI:', returnedTokenUri);
 };
 
 const runMain = async () => {

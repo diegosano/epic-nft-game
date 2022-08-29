@@ -3,35 +3,33 @@ import { ethers } from 'hardhat';
 const main = async () => {
   const gameContractFactory = await ethers.getContractFactory('EpicGame');
   const gameContract = await gameContractFactory.deploy(
-    ["Aoife Bray", "Eva Lara", "Eleanor Blevins"],
-		[
-			"https://i.imgur.com/0cqZrkN.png",
-			"https://i.imgur.com/Txq4CJJ.png",
-			"https://i.imgur.com/1osfEhf.png",
-		],
+    ['Aoife Bray', 'Eva Lara', 'Eleanor Blevins'],
+    [
+      'https://i.imgur.com/pbvx2J1.png',
+      'https://i.imgur.com/OhuPEMy.png',
+      'https://i.imgur.com/OyETLNw.png',
+    ],
     [150, 100, 50],
-    [50, 100, 150]
+    [50, 100, 150],
+    'Aysha Mathis',
+    'https://i.imgur.com/fwCegM5.png',
+    10000,
+    50
   );
 
   await gameContract.deployed();
   console.log('Contract address: ', gameContract.address);
 
   let txn;
-  txn = await gameContract.mintCharacter(0);
-  await txn.wait();
-  console.log('Minted NFT #1');
-
-  txn = await gameContract.mintCharacter(1);
-  await txn.wait();
-  console.log('Minted NFT #2');
 
   txn = await gameContract.mintCharacter(2);
   await txn.wait();
-  console.log('Minted NFT #3');
 
-  txn = await gameContract.mintCharacter(1);
+  txn = await gameContract.attackBoss();
   await txn.wait();
-  console.log('Minted NFT #4');
+
+  const returnedTokenUri = await gameContract.tokenURI(1);
+  console.log('Token URI:', returnedTokenUri);
 };
 
 const runMain = async () => {

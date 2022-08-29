@@ -9,12 +9,12 @@ import "./libraries/Base64.sol";
 
 contract EpicGame is ERC721 {
     struct Character {
-        uint characterIndex;
+        uint256 characterIndex;
         string name;
         string imageURI;
-        uint hp;
-        uint maxHp;
-        uint attackDamage;
+        uint256 hp;
+        uint256 maxHp;
+        uint256 attackDamage;
     }
 
     using Counters for Counters.Counter;
@@ -25,13 +25,35 @@ contract EpicGame is ERC721 {
     mapping(uint256 => Character) public holderCharacter;
     mapping(address => uint256) public holders;
 
+    struct Boss {
+        string name;
+        string imageURI;
+        uint256 hp;
+        uint256 maxHp;
+        uint256 attackDamage;
+    }
+
+    Boss public boss;
+
     constructor(
         string[] memory characterNames,
         string[] memory characterImageURIs,
-        uint[] memory characterHp,
-        uint[] memory characterAttackDmg
+        uint256[] memory characterHp,
+        uint256[] memory characterAttackDmg,
+        string memory bossName,
+        string memory bossImageURI,
+        uint256 bossHp,
+        uint256 bossAttackDamage
     ) ERC721("Heroes", "HERO") {
-        for (uint i = 0; i < characterNames.length; i += 1) {
+        boss = Boss({
+            name: bossName,
+            imageURI: bossImageURI,
+            hp: bossHp,
+            maxHp: bossHp,
+            attackDamage: bossAttackDamage
+        });
+
+        for (uint256 i = 0; i < characterNames.length; i += 1) {
             defaultCharacters.push(
                 Character({
                     characterIndex: i,
@@ -56,7 +78,7 @@ contract EpicGame is ERC721 {
         }
     }
 
-    function mintCharacter(uint _characterIndex) external {
+    function mintCharacter(uint256 _characterIndex) external {
         uint256 newItemId = _tokenIds.current();
 
         _safeMint(msg.sender, newItemId);
@@ -87,9 +109,7 @@ contract EpicGame is ERC721 {
         override
         returns (string memory)
     {
-        Character memory character = holderCharacter[
-            _tokenId
-        ];
+        Character memory character = holderCharacter[_tokenId];
 
         string memory strHp = Strings.toString(character.hp);
         string memory strMaxHp = Strings.toString(character.maxHp);
@@ -120,5 +140,49 @@ contract EpicGame is ERC721 {
         );
 
         return output;
+    }
+
+    function attackBoss() public {
+        uint256 characterId = holders[msg.sender];
+        Character storage character = holderCharacter[characterId];
+
+        console.log(
+            "\nCharacter %s \nHP: %s \nAP:%s",
+            character.name,
+            character.hp,
+            character.attackDamage
+        );
+        console.log(
+            "\nBoss %s \nHP: %s \n:AP %s",
+            boss.name,
+            boss.hp,
+            boss.attackDamage
+        );
+
+        require(
+            character.hp > 0,
+            "Error: character need positive HP to attack the boss!"
+        );
+
+        require(
+            boss.hp > 0,
+            "Error: boss need positive HP to be attacked by the character!"
+        );
+
+        if (boss.hp < character.attackDamage) {
+            boss.hp = 0;
+        } else {
+            boss.hp = boss.hp - character.attackDamage;
+        }
+
+        console.log("Character attacks. Boss HP: %s", boss.hp);
+
+        if (character.hp < boss.attackDamage) {
+            character.hp = 0;
+        } else {
+            character.hp = character.hp - boss.attackDamage;
+        }
+
+        console.log("Boss attacks. Character HP: %s", character.hp);
     }
 }
