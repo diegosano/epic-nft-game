@@ -10,6 +10,10 @@ const config: HardhatUserConfig = {
     goerli: {
       url: process.env.ALCHEMY_STAGING_URL,
       accounts: [process.env.ALCHEMY_PRIVATE_KEY]
+    },
+    rinkeby: {
+      url: process.env.ALCHEMY_STAGING_URL,
+      accounts: [process.env.ALCHEMY_PRIVATE_KEY]
     }
   }
 };
