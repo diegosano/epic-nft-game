@@ -25,6 +25,9 @@ contract EpicGame is ERC721 {
     mapping(uint256 => Character) public holderCharacter;
     mapping(address => uint256) public holders;
 
+    event CharacterMinted(address sender, uint256 tokenId, uint256 characterIndex);
+    event AttackComplete(uint newBossHP, uint newPlayerHP);
+
     struct Boss {
         string name;
         string imageURI;
@@ -101,6 +104,8 @@ contract EpicGame is ERC721 {
         holders[msg.sender] = newItemId;
 
         _tokenIds.increment();
+
+        emit CharacterMinted(msg.sender, newItemId, _characterIndex);
     }
 
     function tokenURI(uint256 _tokenId)
@@ -152,6 +157,7 @@ contract EpicGame is ERC721 {
             character.hp,
             character.attackDamage
         );
+
         console.log(
             "\nBoss %s \nHP: %s \n:AP %s",
             boss.name,
@@ -184,5 +190,30 @@ contract EpicGame is ERC721 {
         }
 
         console.log("Boss attacks. Character HP: %s", character.hp);
+
+        emit AttackComplete(boss.hp, character.hp);
+    }
+
+    function checkIfUserHasNFT() public view returns (Character memory) {
+        uint256 characterId = holders[msg.sender];
+
+        if (characterId > 0) {
+            return holders[characterId];
+        } else {
+            Character memory emptyStruct;
+            return emptyStruct;
+        }
+    }
+
+    function getAllDefaultCharacters()
+        public
+        view
+        returns (Character[] memory)
+    {
+        return defaultCharacters;
+    }
+
+    function getBoss() public view returns (Boss memory) {
+        return boss;
     }
 }

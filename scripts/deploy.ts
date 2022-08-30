@@ -18,18 +18,8 @@ const main = async () => {
   );
 
   await gameContract.deployed();
+
   console.log('Contract address: ', gameContract.address);
-
-  let txn;
-
-  txn = await gameContract.mintCharacter(2);
-  await txn.wait();
-
-  txn = await gameContract.attackBoss();
-  await txn.wait();
-
-  const returnedTokenUri = await gameContract.tokenURI(1);
-  console.log('Token URI:', returnedTokenUri);
 };
 
 const runMain = async () => {
